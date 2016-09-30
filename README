@@ -1,6 +1,6 @@
 sml-curl - libcurl for Standard ML and http client with asynchronous support (via sml-ev)
 
-It is for Poly/ML and MLton
+It is for Poly/ML and MLton, *BSD and Linix.
 
  curl-{poly,mlton}.sml - Curl, Curl.Easy, Curl.Multi structures
  curl-conts.sml        - CurlConst - curl constants

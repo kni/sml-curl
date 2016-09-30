@@ -4,7 +4,7 @@ It is for Poly/ML and MLton
 
  curl-{poly,mlton}.sml - Curl, Curl.Easy, Curl.Multi structures
  curl-conts.sml        - CurlConst - curl constants
- curl-ev.sml           - integration with с Ev (https://github.com/kni/sml-ev)
+ curl-ev.sml           - integration with Ev (https://github.com/kni/sml-ev)
  curl-http.sml         - http client with with the possibility to use curl-ev
  t.sml                 - example of using curl-http
  t-ev.sml              - example of asynchronous using curl-http

@@ -145,6 +145,8 @@ struct
           let
             val reason = curl_easy_strerror(result)
           in
+            curl_easy_cleanup(curl);
+            free ();
             cb(false, 500, reason, "", "", [("Status", "500"), ("Reason", reason)], [])
           end
         else
@@ -156,17 +158,20 @@ struct
             val body = String.concat (List.rev (!body_ref))
           in
             if result = CURLE_OK
-            then cb(is_success, status, reason, new_url, body, headers, redirects)
+            then (
+                curl_easy_cleanup(curl);
+                free ();
+                cb(is_success, status, reason, new_url, body, headers, redirects)
+              )
             else
               let
                 val reason = curl_easy_strerror(result)
               in
+                curl_easy_cleanup(curl);
+                free ();
                 cb(false, 599, reason, new_url, body, headers, redirects)
               end
           end
-        ;
-        curl_easy_cleanup(curl);
-        free ()
         )
       
     in

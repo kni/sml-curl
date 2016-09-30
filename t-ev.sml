@@ -1,12 +1,3 @@
-use "sml-ev/hash-array-int.sml";
-use "sml-ev/ev-kqueue-poly.sml";
-use "sml-ev/ev-with-timer.sml";
-use "curl-const.sml";
-use "curl-poly.sml";
-use "curl-ev.sml";
-use "curl-http.sml";
-
-
 open CurlHTTP
 fun main_handle () = Curl.withCurl ( fn () => 
     let
@@ -31,8 +22,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
           "http://www.polyml.org/",
           "http://www.mlton.org/",
           "http://melsman.github.io/mlkit",
-          "http://www.smlserver.org/smltojs",
-          "http://www.smlserver.org/ide",
+          "http://www.smlserver.org",
           "http://www.mpi-sws.org/~rossberg/hamlet/",
           "http://www.smlnj.org/",
           "http://www.pllab.riec.tohoku.ac.jp/smlsharp/",
@@ -51,10 +41,14 @@ fun main_handle () = Curl.withCurl ( fn () =>
           (HttpHeaders [("Accept", "*/*"), ("Accept-Language", "*")])
         ]
 
-      fun cb add_request (is_success, status, reason, new_url, body, headers, redirects) =
+      fun cb add_request url (is_success, status, reason, new_url, body, headers, redirects) =
         (
         ev_continue := (!ev_continue) - 1;
-        print ((Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^ "\n");
+        (
+        if is_success
+        then print ("Answer:  " ^ (Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^ "\n")
+        else print ("Answer:  " ^ (Int.toString status) ^ " (" ^ reason ^ ") " ^     url ^ "\n")
+        );
         add_request ()
         )
 
@@ -65,7 +59,8 @@ fun main_handle () = Curl.withCurl ( fn () =>
            | (u::us) => (
              urls := us;
              ev_continue := (!ev_continue) + 1;
-             doHttp (SOME curl_ev) u opt (cb add_request);
+             print ("Request: " ^ u ^ "\n");
+             doHttp (SOME curl_ev) u opt (cb add_request u);
              ()
            )
 

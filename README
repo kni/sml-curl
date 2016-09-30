@@ -9,4 +9,11 @@ It is for Poly/ML and MLton
  t.sml                 - example of using curl-http
  t-ev.sml              - example of asynchronous using curl-http
 
-To use asynchronous curl-http you should get https://github.com/kni/sml-ev
+To use asynchronous curl-http you should get https://github.com/kni/sml-ev (make ev).
+
+To build all test - make poly mlton ev-poly ev-mlton.
+For Linux: replace kqueue on epoll in t-ev.sml.
+
+Files for build t.sml and t-ev.sml:
+poly)  t-poly.sml and t-ev-poly.sml
+mlton) t.mlb, t-ev.mlb and main.sml

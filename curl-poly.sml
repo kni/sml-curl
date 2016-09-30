@@ -22,6 +22,7 @@ sig
   sig
     type multi
     type easy
+    val easy2int : easy -> LargeInt.int
     val curl_multi_init      : unit -> multi
     val curl_multi_cleanup   : multi -> int
     val curl_multi_setopt_timer_cb  : multi * (multi * int -> int) -> int
@@ -167,6 +168,8 @@ struct
   struct
     type multi = Memory.voidStar
     type easy = Easy.curl
+
+    val easy2int = SysWord.toLargeInt o Foreign.Memory.voidStar2Sysword
 
     val curl_multi_init_ffi = buildCall1 ((getSymbol libcurl "curl_multi_init"), cVoid, cPointer)
 

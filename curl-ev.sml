@@ -9,10 +9,8 @@ struct
   exception CurlEv of string
   open CurlConst Curl.Multi
   open EvWithTimer
-  structure H = HashArrayInt
+  structure H = HashArrayLargeInt
   
-  val voidStar2int = SysWord.toInt o Foreign.Memory.voidStar2Sysword
-
   fun curl_ev ev multi =
     let
       val hash_size = 100
@@ -29,7 +27,7 @@ struct
             let
               fun doFinish easy result =
                 let 
-                  val easy_int = voidStar2int easy
+                  val easy_int = easy2int easy
                   val finish = valOf(H.sub(finishH, easy_int))
                 in 
                   H.delete(timerH, easy_int);
@@ -56,7 +54,7 @@ struct
 
       fun add_handle(easy, finish:(Curl.Easy.curl * int -> unit), timeout) =
         let
-          val easy_int = voidStar2int easy
+          val easy_int = easy2int easy
           val _ = H.update(finishH, easy_int, finish)
 
           fun cb_big_timeout () =
@@ -79,7 +77,7 @@ struct
           let 
             val timer_id = evTimerNew ev
           in
-            evTimerAdd ev (timer_id, Time.fromSeconds(timeout), cb_big_timeout );
+            evTimerAdd ev (timer_id, Time.fromSeconds(Int.toLarge timeout), cb_big_timeout );
             H.update(timerH, easy_int, timer_id)
           end
         end
@@ -92,7 +90,7 @@ struct
       fun cb_timer(multi, timeout_ms) = (
         if timeout_ms < 0
         then ( timerLoopVal := Time.fromSeconds 10 )
-        else ( timerLoopVal := Time.fromMilliseconds timeout_ms; timerLoop () )
+        else ( timerLoopVal := Time.fromMilliseconds (Int.toLarge timeout_ms); timerLoop () )
         ; 1)
 
 

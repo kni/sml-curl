@@ -1,8 +1,3 @@
-use "curl-const.sml";
-use "curl-poly.sml";
-use "curl-http.sml";
-
-
 open CurlHTTP
 fun main_handle () = Curl.withCurl ( fn () => 
     let

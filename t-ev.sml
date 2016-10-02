@@ -6,7 +6,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
       open Curl.Multi
       open EvWithTimer
 
-      val ev = evIni ()
+      val ev = evInit ()
 
       val ev_continue = ref 0
 

@@ -1,9 +1,9 @@
 open CurlHTTP
 fun main_handle () = Curl.withCurl ( fn () => 
     let
-      val _ = print ((Curl.curl_version ()) ^ "\n")
+      val _ = print ((Curl.version ()) ^ "\n")
 
-      open Curl.Multi
+      open Curl
       open EvWithTimer
 
       val ev = evInit ()
@@ -13,7 +13,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
       val timer_id = evTimerNew ev
       val _ = evTimerAdd ev (timer_id, Time.fromSeconds(5 * 60), fn () => (print "END timeout\n" ; ev_continue := 0 ));
 
-      val multi = curl_multi_init () (* ToDo val withCurlMulti : (multi -> unit) -> init *)
+      val multi = Multi.init () (* ToDo val withCurlMulti : (multi -> unit) -> init *)
       val curl_ev = CurlEv.curl_ev ev multi
 
       val urls = ref [
@@ -71,7 +71,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
      add_request ();
      add_request ();
      while (!ev_continue) > 0 do evWait ev (SOME (Time.fromSeconds 3));
-     curl_multi_cleanup multi;
+     Multi.cleanup multi;
      ()
    end
 

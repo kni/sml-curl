@@ -7,10 +7,12 @@ sig
 end =
 struct
   exception CurlEv of string
-  open CurlConst Curl.Multi
+  open CurlConst Curl
   open EvWithTimer
   structure H = HashArrayLargeInt
-  
+  type easy = Easy.curl
+  type multi = Multi.multi
+
   fun curl_ev ev multi =
     let
       val hash_size = 100
@@ -21,13 +23,13 @@ struct
 
       fun socket_action(socket, ev_bitmask) =
         let
-          val active = curl_multi_socket_action(multi, socket, ev_bitmask)
+          val active = Multi.socket_action(multi, socket, ev_bitmask)
 
           fun info_read () =
             let
               fun doFinish easy result =
                 let 
-                  val easy_int = easy2int easy
+                  val easy_int = Multi.easy2int easy
                   val finish = valOf(H.sub(finishH, easy_int))
                 in 
                   H.delete(timerH, easy_int);
@@ -35,7 +37,7 @@ struct
                   finish(easy, result)
                 end
             in
-              case curl_multi_info_read(multi) of
+              case Multi.info_read(multi) of
                    NONE => ()
                  | SOME (msg, easy, result) =>
                      if msg = CURLMSG_DONE 
@@ -54,7 +56,7 @@ struct
 
       fun add_handle(easy, finish:(Curl.Easy.curl * int -> unit), timeout) =
         let
-          val easy_int = easy2int easy
+          val easy_int = Multi.easy2int easy
           val _ = H.update(finishH, easy_int, finish)
 
           fun cb_big_timeout () =
@@ -64,13 +66,13 @@ struct
                  (
                     evTimerDelete ev timer_id;
                     H.delete(timerH, easy_int);
-                    curl_multi_remove_handle(multi, easy);
+                    Multi.remove_handle(multi, easy);
                     valOf(H.sub(finishH, easy_int)) (easy:Curl.Easy.curl, CURLE_COULDNT_CONNECT);
                     H.delete(finishH, easy_int)
                   )
 
         in
-          curl_multi_add_handle(multi, easy);
+          Multi.add_handle(multi, easy);
           evTimerAdd ev (add_handle_timer_id, Time.fromMilliseconds 1, cb_timeout);
 
           if timeout = 0 then () else 
@@ -106,8 +108,8 @@ struct
 
 
     in
-      curl_multi_setopt_socket_cb(multi, cb_socket);
-      curl_multi_setopt_timer_cb(multi, cb_timer);
+      Multi.setopt_socket_cb(multi, cb_socket);
+      Multi.setopt_timer_cb(multi, cb_timer);
       timerLoop();
       add_handle
     end

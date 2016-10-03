@@ -18,7 +18,7 @@ sig
 end 
 =
 struct
-  open Curl.Easy CurlConst
+  open Curl CurlConst
 
   datatype HttpOpt = HttpVerbose            of bool
                    | HttpFollowlocation     of bool
@@ -31,24 +31,24 @@ struct
                    | HttpHeaders            of (string * string) list
 
 
-  type curl_ev_add_handle = Curl.Easy.curl * (Curl.Easy.curl * int -> unit) * int -> unit
+  type curl_ev_add_handle = Easy.curl * (Easy.curl * int -> unit) * int -> unit
 
   type http_cb = ((bool * int * string * string * string * (string * string) list * (string * string) list list) -> unit)
 
 
   fun setHttpOpt curl opt =
     let
-      fun doit (HttpVerbose true)         = ( curl_easy_setopt_int(curl, CURLOPT_VERBOSE, 1)         ; NONE )
-        | doit (HttpVerbose false)        = ( curl_easy_setopt_int(curl, CURLOPT_VERBOSE, 0)         ; NONE )
-        | doit (HttpFollowlocation true)  = ( curl_easy_setopt_int(curl, CURLOPT_FOLLOWLOCATION, 1)  ; NONE )
-        | doit (HttpFollowlocation false) = ( curl_easy_setopt_int(curl, CURLOPT_FOLLOWLOCATION, 0)  ; NONE )
-        | doit (HttpMaxRedirs v)          = ( curl_easy_setopt_int(curl, CURLOPT_MAXREDIRS, v)       ; NONE )
-        | doit (HttpCookieFile v)         = ( curl_easy_setopt_str(curl, CURLOPT_COOKIEFILE, v)      ; NONE )
-        | doit (HttpUserAgent v)          = ( curl_easy_setopt_str(curl, CURLOPT_USERAGENT, v)       ; NONE )
-        | doit (HttpProxy v)              = ( curl_easy_setopt_str(curl, CURLOPT_PROXY, v)           ; NONE )
-        | doit (HttpTimeout v)            = ( curl_easy_setopt_int(curl, CURLOPT_TIMEOUT, v)         ; NONE )
-        | doit (HttpAcceptEncoding v)     = ( curl_easy_setopt_str(curl, CURLOPT_ACCEPT_ENCODING, v) ; NONE )
-        | doit (HttpHeaders l)            = SOME (curl_easy_setopt_list(curl, CURLOPT_HTTPHEADER, (List.map (fn(n,v) => (n ^ ": " ^ v) ) l)))
+      fun doit (HttpVerbose true)         = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 1)         ; NONE )
+        | doit (HttpVerbose false)        = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 0)         ; NONE )
+        | doit (HttpFollowlocation true)  = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 1)  ; NONE )
+        | doit (HttpFollowlocation false) = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 0)  ; NONE )
+        | doit (HttpMaxRedirs v)          = ( Easy.setopt_int(curl, CURLOPT_MAXREDIRS, v)       ; NONE )
+        | doit (HttpCookieFile v)         = ( Easy.setopt_str(curl, CURLOPT_COOKIEFILE, v)      ; NONE )
+        | doit (HttpUserAgent v)          = ( Easy.setopt_str(curl, CURLOPT_USERAGENT, v)       ; NONE )
+        | doit (HttpProxy v)              = ( Easy.setopt_str(curl, CURLOPT_PROXY, v)           ; NONE )
+        | doit (HttpTimeout v)            = ( Easy.setopt_int(curl, CURLOPT_TIMEOUT, v)         ; NONE )
+        | doit (HttpAcceptEncoding v)     = ( Easy.setopt_str(curl, CURLOPT_ACCEPT_ENCODING, v) ; NONE )
+        | doit (HttpHeaders l)            = SOME (Easy.setopt_list(curl, CURLOPT_HTTPHEADER, (List.map (fn(n,v) => (n ^ ": " ^ v) ) l)))
 
       val free_setopt_list = List.foldl (fn(opt, free) => case doit opt of NONE => free | SOME f => f::free) [] opt
 
@@ -65,20 +65,20 @@ struct
 
   fun doHttp curl_ev url opt cb =
     let
-      val curl = curl_easy_init ()
+      val curl = Easy.init ()
       
-      val _ = curl_easy_setopt_str(curl, CURLOPT_URL, url)
+      val _ = Easy.setopt_str(curl, CURLOPT_URL, url)
 
       val free = setHttpOpt curl opt
 
 
       val headers_ref = ref []
       fun header_cb s = (headers_ref := s::(!headers_ref) ; String.size s)
-      val _ = curl_easy_setopt_cb(curl, CURLOPT_HEADERFUNCTION, header_cb)
+      val _ = Easy.setopt_cb(curl, CURLOPT_HEADERFUNCTION, header_cb)
 
       val body_ref = ref []
       fun write_cb s = (body_ref := s::(!body_ref); String.size s)
-      val _ = curl_easy_setopt_cb(curl, CURLOPT_WRITEFUNCTION, write_cb)
+      val _ = Easy.setopt_cb(curl, CURLOPT_WRITEFUNCTION, write_cb)
 
 
       fun headers_parse headers =
@@ -143,9 +143,9 @@ struct
         if List.null (!headers_ref)
         then
           let
-            val reason = curl_easy_strerror(result)
+            val reason = Easy.strerror(result)
           in
-            curl_easy_cleanup(curl);
+            Easy.cleanup(curl);
             free ();
             cb(false, 500, reason, "", "", [("Status", "500"), ("Reason", reason)], [])
           end
@@ -154,20 +154,20 @@ struct
             val (status, reason, headers, redirects) = headers_parse (List.rev(!headers_ref))
             (* val _ = printHeaders (headers::redirects) *)
             val is_success = status >= 200 andalso status < 300
-            val new_url =  curl_easy_getinfo_str(curl, CURLINFO_EFFECTIVE_URL)
+            val new_url =  Easy.getinfo_str(curl, CURLINFO_EFFECTIVE_URL)
             val body = String.concat (List.rev (!body_ref))
           in
             if result = CURLE_OK
             then (
-                curl_easy_cleanup(curl);
+                Easy.cleanup(curl);
                 free ();
                 cb(is_success, status, reason, new_url, body, headers, redirects)
               )
             else
               let
-                val reason = curl_easy_strerror(result)
+                val reason = Easy.strerror(result)
               in
-                curl_easy_cleanup(curl);
+                Easy.cleanup(curl);
                 free ();
                 cb(false, 599, reason, new_url, body, headers, redirects)
               end
@@ -176,7 +176,7 @@ struct
       
     in
       case curl_ev of
-          NONE         => ( finish (curl, curl_easy_perform(curl)) )
+          NONE         => ( finish (curl, Easy.perform(curl)) )
         | SOME curl_ev => ( curl_ev(curl, finish, (timeout_option opt)) )
     end
 end

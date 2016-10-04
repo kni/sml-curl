@@ -75,7 +75,7 @@ struct
     val perform = _import "curl_easy_perform" reentrant: t -> int;
 
 
-    val cleanup_ffi = _import "curl_easy_cleanup" reentrant: t -> int;
+    val cleanup_ffi = _import "curl_easy_cleanup" reentrant: t -> unit;
     fun cleanup curl =
       let
         val easy_int = easy2int curl

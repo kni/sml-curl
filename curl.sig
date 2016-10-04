@@ -13,7 +13,7 @@ sig
     val setopt_cb  : curl * int * (string -> int) -> int
     val setopt_list : curl * int * string list -> (unit -> unit)
     val perform    : curl -> int
-    val cleanup    : curl -> int
+    val cleanup    : curl -> unit
     val getinfo_str : curl * int -> string
     val strerror   : int -> string
   end

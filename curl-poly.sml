@@ -50,7 +50,7 @@ struct
     val setopt_int  = buildCall3 ((getSymbol libcurl "curl_easy_setopt"),  (cPointer, cInt, cLong), cInt)
 
     val perform     = buildCall1 ((getSymbol libcurl "curl_easy_perform"),  cPointer, cInt)
-    val cleanup     = buildCall1 ((getSymbol libcurl "curl_easy_cleanup"),  cPointer, cInt)
+    val cleanup     = buildCall1 ((getSymbol libcurl "curl_easy_cleanup"),  cPointer, cVoid)
 
     val setopt_cb_ffi = buildCall3 ((getSymbol libcurl "curl_easy_setopt"),  (cPointer, cInt, cFunction), cInt)
 

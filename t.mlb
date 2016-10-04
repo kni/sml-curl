@@ -4,6 +4,7 @@ local
 	$(SML_LIB)/basis/c-types.mlb
 in
 	hash-array-large-int.sml
+        curl.sig
 	curl-const.sml
 	curl-mlton.sml
 	curl-http.sml

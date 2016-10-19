@@ -7,7 +7,7 @@ sig
 end =
 struct
   exception CurlEv of string
-  open CurlConst Curl.Multi
+  open Curl.Const Curl.Multi
   open EvWithTimer
   structure H = HashArrayLargeInt
   

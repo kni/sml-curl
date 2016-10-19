@@ -4,6 +4,8 @@ sig
   val withCurl : (unit -> unit) -> unit
   val curl_version : unit -> string
 
+  structure Const : CURL_CONST
+
   structure Easy :
   sig
     type curl
@@ -39,7 +41,8 @@ end
 structure Curl : CURL =
 struct
   exception Curl of int
-  open CurlConst
+  structure Const = CurlConst
+  open Const
   open MLton.Pointer
 
   val malloc = (_import "malloc": Word.word -> t;) o Word.fromInt

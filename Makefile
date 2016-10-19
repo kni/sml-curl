@@ -1,5 +1,7 @@
-all:
-	@echo "target: poly, mlton, ev-poly, ev-mlton, clean"
+help:
+	@echo "target: all (poly mlton ev-poly ev-mlton) clean"
+
+all: poly mlton ev-poly ev-mlton
 
 poly:
 	polyc -o t-poly t-poly.sml

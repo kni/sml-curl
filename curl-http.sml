@@ -18,7 +18,7 @@ sig
 end 
 =
 struct
-  open Curl.Easy CurlConst
+  open Curl.Const Curl.Easy 
 
   datatype HttpOpt = HttpVerbose            of bool
                    | HttpFollowlocation     of bool

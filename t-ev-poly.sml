@@ -2,6 +2,8 @@ use "ev/hash-array-int.sml";
 use "ev/ev-kqueue-poly.sml";
 use "ev/ev-with-timer.sml";
 use "hash-array-large-int.sml";
+use "curl-const.sig";
+use "curl.sig";
 use "curl-const.sml";
 use "curl-poly.sml";
 use "curl-ev.sml";

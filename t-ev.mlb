@@ -1,16 +1,18 @@
 local
-	$(SML_LIB)/basis/mlton.mlb
-	$(SML_LIB)/basis/basis.mlb
-	$(SML_LIB)/basis/c-types.mlb
+    $(SML_LIB)/basis/mlton.mlb
+    $(SML_LIB)/basis/basis.mlb
+    $(SML_LIB)/basis/c-types.mlb
 in
-	ev/hash-array-int.sml
-	ev/ev-kqueue-mlton.sml
-	ev/ev-with-timer.sml
-	hash-array-large-int.sml
-	curl-const.sml
-	curl-mlton.sml
-	curl-ev.sml
-	curl-http.sml
-	t-ev.sml
-	main.sml
+    ev/hash-array-int.sml
+    ev/ev-kqueue-mlton.sml
+    ev/ev-with-timer.sml
+    hash-array-large-int.sml
+    curl-const.sig
+    curl.sig
+    curl-const.sml
+    curl-mlton.sml
+    curl-ev.sml
+    curl-http.sml
+    t-ev.sml
+    main.sml
 end

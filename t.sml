@@ -1,7 +1,7 @@
 open CurlHTTP
 fun main_handle () = Curl.withCurl ( fn () => 
     let
-      val _ = print ((Curl.curl_version ()) ^ "\n")
+      val _ = print ((Curl.version ()) ^ "\n")
 
       val opt = [
           (* (HttpVerbose true), *)

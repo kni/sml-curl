@@ -20,17 +20,11 @@ struct
 
   fun readCString p =
     let
-      val () = ()
-      fun doit p l =
-        let
-          val w = getWord8(p, 0)
-        in
-          if w = 0w0
-          then String.implode (List.rev l)
-          else doit (add(p, 0w1)) ((Byte.byteToChar w)::l)
-        end
+      fun len i = if getWord8 (p, i) = 0w0 then i else len (i + 1)
+      val length = len 0
+      fun getChar i = Byte.byteToChar (getWord8 (p, i))
     in
-      doit p []
+      CharVector.tabulate(length, getChar)
     end
 
 

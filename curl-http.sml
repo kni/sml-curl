@@ -2,6 +2,8 @@ structure CurlHTTP :
 sig
   datatype HttpOpt = HttpVerbose            of bool
                    | HttpFollowlocation     of bool
+                   | HttpSSLVerifyPeer      of bool
+                   | HttpSSLVerifyHost      of bool
                    | HttpMaxRedirs          of int
                    | HttpCookieFile         of string
                    | HttpUserAgent          of string
@@ -22,6 +24,8 @@ struct
 
   datatype HttpOpt = HttpVerbose            of bool
                    | HttpFollowlocation     of bool
+                   | HttpSSLVerifyPeer      of bool
+                   | HttpSSLVerifyHost      of bool
                    | HttpMaxRedirs          of int
                    | HttpCookieFile         of string
                    | HttpUserAgent          of string
@@ -42,6 +46,10 @@ struct
         | doit (HttpVerbose false)        = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 0)         ; NONE )
         | doit (HttpFollowlocation true)  = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 1)  ; NONE )
         | doit (HttpFollowlocation false) = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 0)  ; NONE )
+        | doit (HttpSSLVerifyPeer true)   = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYPEER, 1)  ; NONE )
+        | doit (HttpSSLVerifyPeer false)  = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYPEER, 0)  ; NONE )
+        | doit (HttpSSLVerifyHost true)   = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYHOST, 1)  ; NONE )
+        | doit (HttpSSLVerifyHost false)  = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYHOST, 0)  ; NONE )
         | doit (HttpMaxRedirs v)          = ( Easy.setopt_int(curl, CURLOPT_MAXREDIRS, v)       ; NONE )
         | doit (HttpCookieFile v)         = ( Easy.setopt_str(curl, CURLOPT_COOKIEFILE, v)      ; NONE )
         | doit (HttpUserAgent v)          = ( Easy.setopt_str(curl, CURLOPT_USERAGENT, v)       ; NONE )

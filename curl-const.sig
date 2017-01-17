@@ -8,6 +8,8 @@ sig
   val CURLE_COULDNT_CONNECT : int
   val CURLOPT_URL             : int
   val CURLOPT_FOLLOWLOCATION  : int
+  val CURLOPT_SSL_VERIFYPEER  : int
+  val CURLOPT_SSL_VERIFYHOST  : int
   val CURLOPT_MAXREDIRS       : int
   val CURLOPT_COOKIEFILE      : int
   val CURLOPT_USERAGENT       : int

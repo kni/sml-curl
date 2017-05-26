@@ -62,14 +62,16 @@ struct
           fun cb_big_timeout () =
             case H.sub(timerH, easy_int) of
                  NONE => ()
-               | SOME timer_id => 
-                 (
+               | SOME timer_id =>
+                  let
+                    val finish = valOf(H.sub(finishH, easy_int))
+                  in
                     evTimerDelete ev timer_id;
                     H.delete(timerH, easy_int);
+                    H.delete(finishH, easy_int);
                     Multi.remove_handle(multi, easy);
-                    valOf(H.sub(finishH, easy_int)) (easy:Curl.Easy.curl, CURLE_COULDNT_CONNECT);
-                    H.delete(finishH, easy_int)
-                  )
+                    finish (easy:Curl.Easy.curl, CURLE_COULDNT_CONNECT)
+                  end
 
         in
           Multi.add_handle(multi, easy);
@@ -87,7 +89,7 @@ struct
 
       val timerId = evTimerNew ev
       val timerLoopVal = ref (Time.fromMilliseconds 1)
-      fun timerLoop () = evTimerAdd ev (timerId, (!timerLoopVal), fn () => ( cb_timeout ();  timerLoop () ))
+      fun timerLoop () = evTimerAdd ev (timerId, (!timerLoopVal), fn () => ( cb_timeout (); timerLoop () ))
 
       fun cb_timer(multi, timeout_ms) = (
         if timeout_ms < 0

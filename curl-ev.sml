@@ -31,9 +31,11 @@ struct
                 let 
                   val easy_int = Multi.easy2int easy
                   val finish = valOf(H.sub(finishH, easy_int))
+                  val timer_id_Option = H.sub(timerH, easy_int)
                 in 
                   H.delete(timerH, easy_int);
                   H.delete(finishH, easy_int);
+                  (case timer_id_Option of NONE => () | SOME timer_id => evTimerDelete ev timer_id);
                   finish(easy, result)
                 end
             in

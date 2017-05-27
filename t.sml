@@ -3,6 +3,13 @@ fun main_handle () = Curl.withCurl ( fn () =>
     let
       val _ = print ((Curl.version ()) ^ "\n")
 
+      fun onHead (is_success, status, reason, new_url, headers, redirects) = (
+          print ("onHead: " ^ (Int.toString status) ^ " (" ^ reason ^ ")\n");
+          true
+        )
+
+      fun onBody body = ( print ("size=" ^ (Int.toString(String.size body)) ^ "\n"); true )
+
       val opt = [
           (* (HttpVerbose true), *)
           (HttpFollowlocation true),
@@ -15,10 +22,15 @@ fun main_handle () = Curl.withCurl ( fn () =>
           (HttpTimeout 30),
           (HttpAcceptEncoding "gzip"),
           (HttpHeaders [("Accept", "*/*"), ("Accept-Language", "*")])
+
+          (* 
+          , (HttpOnHead onHead)
+          , (HttpOnBody onBody)
+          *)
         ]
 
       fun cb(is_success, status, reason, new_url, body, headers, redirects) =
-        print ((Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^ "\n")
+        print ((Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^ " BodySize=" ^ (Int.toString(String.size body)) ^ "\n")
     in
       doHttp NONE "https://www.google.com/" opt cb
     end

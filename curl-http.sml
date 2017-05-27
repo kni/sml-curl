@@ -11,6 +11,8 @@ sig
                    | HttpProxy              of string
                    | HttpAcceptEncoding     of string
                    | HttpHeaders            of (string * string) list
+                   | HttpOnHead             of (bool * int * string * string * (string * string) list * (string * string) list list) -> bool
+                   | HttpOnBody             of string -> bool
 
   type curl_ev_add_handle = Curl.Easy.curl * (Curl.Easy.curl * int -> unit) * int -> unit
 
@@ -33,12 +35,16 @@ struct
                    | HttpProxy              of string
                    | HttpAcceptEncoding     of string
                    | HttpHeaders            of (string * string) list
+                   | HttpOnHead             of (bool * int * string * string * (string * string) list * (string * string) list list) -> bool
+                   | HttpOnBody             of string -> bool
 
 
   type curl_ev_add_handle = Easy.curl * (Easy.curl * int -> unit) * int -> unit
 
   type http_cb = ((bool * int * string * string * string * (string * string) list * (string * string) list list) -> unit)
 
+  val onHead = ref NONE
+  val onBody = ref NONE
 
   fun setHttpOpt curl opt =
     let
@@ -57,6 +63,8 @@ struct
         | doit (HttpTimeout v)            = ( Easy.setopt_int(curl, CURLOPT_TIMEOUT, v)         ; NONE )
         | doit (HttpAcceptEncoding v)     = ( Easy.setopt_str(curl, CURLOPT_ACCEPT_ENCODING, v) ; NONE )
         | doit (HttpHeaders l)            = SOME (Easy.setopt_list(curl, CURLOPT_HTTPHEADER, (List.map (fn(n,v) => (n ^ ": " ^ v) ) l)))
+        | doit (HttpOnHead f)             = ( onHead := SOME f ; NONE )
+        | doit (HttpOnBody f)             = ( onBody := SOME f ; NONE )
 
       val free_setopt_list = List.foldl (fn(opt, free) => case doit opt of NONE => free | SOME f => f::free) [] opt
 
@@ -80,16 +88,7 @@ struct
       val free = setHttpOpt curl opt
 
 
-      val headers_ref = ref []
-      fun header_cb s = (headers_ref := s::(!headers_ref) ; String.size s)
-      val _ = Easy.setopt_cb(curl, CURLOPT_HEADERFUNCTION, header_cb)
-
-      val body_ref = ref []
-      fun write_cb s = (body_ref := s::(!body_ref); String.size s)
-      val _ = Easy.setopt_cb(curl, CURLOPT_WRITEFUNCTION, write_cb)
-
-
-      fun headers_parse headers =
+      fun headers_parse headers = (
         let
           val chomp = Substring.dropr  (fn c => c = #"\r" orelse c = #"\n")
           val drop_l_space = Substring.dropl (fn c => c = #" ")
@@ -143,6 +142,33 @@ struct
                NONE        => (599, "Status in not number", h, r) 
              | SOME status => (status, reason, h, r) 
         end
+      )
+
+
+      val headers_ref = ref []
+      fun header_cb s = (headers_ref := s::(!headers_ref) ; String.size s)
+      val _ = Easy.setopt_cb(curl, CURLOPT_HEADERFUNCTION, header_cb)
+
+
+      fun on_head s = case (!onHead) of NONE => true | SOME f =>
+        let
+          val (status, reason, headers, redirects) = headers_parse (List.rev(!headers_ref))
+          val is_success = status >= 200 andalso status < 300
+          val new_url =  Easy.getinfo_str(curl, CURLINFO_EFFECTIVE_URL)
+        in
+          onHead := NONE;
+          f (is_success, status, reason, new_url, headers, redirects)
+        end
+
+      val body_ref = ref []
+
+      fun write_cb s = case on_head s of false  => 0 | true =>
+        case (!onBody) of
+             NONE   => ( body_ref := s::(!body_ref); String.size s )
+           | SOME f => if f s then String.size s else 0
+
+      val _ = Easy.setopt_cb(curl, CURLOPT_WRITEFUNCTION, write_cb)
+
 
       fun printHeaders hs = List.foldl ( fn(h,r) => ( print(String.concat( List.map (fn(n,v) => (n ^ ": " ^ v ^ "\n")) h )) ; print("\n"); r) ) 0 hs
 

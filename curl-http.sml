@@ -43,10 +43,7 @@ struct
 
   type http_cb = ((bool * int * string * string * string * (string * string) list * (string * string) list list) -> unit)
 
-  val onHead = ref NONE
-  val onBody = ref NONE
-
-  fun setHttpOpt curl opt =
+  fun setHttpOpt curl onHead onBody opt =
     let
       fun doit (HttpVerbose true)         = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 1)         ; NONE )
         | doit (HttpVerbose false)        = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 0)         ; NONE )
@@ -85,7 +82,10 @@ struct
       
       val _ = Easy.setopt_str(curl, CURLOPT_URL, url)
 
-      val free = setHttpOpt curl opt
+      val onHead = ref NONE
+      val onBody = ref NONE
+
+      val free = setHttpOpt curl onHead onBody opt
 
 
       fun headers_parse headers = (

@@ -55,7 +55,9 @@ struct
         else curl
       end
 
-    val setopt_str = _import "curl_easy_setopt": t * int * string -> int;
+
+    val setopt_str_ffi = _import "curl_easy_setopt": t * int * string -> int;
+    fun setopt_str (curl, opt, str) = setopt_str_ffi (curl, opt, str ^ "\000")
 
 
     val setopt_int_32bit = _import "curl_easy_setopt": t * int * Int32.int -> int;

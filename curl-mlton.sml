@@ -11,6 +11,9 @@ struct
   val global_init    = _import "curl_global_init": int -> int;
   val global_cleanup = _import "curl_global_cleanup": unit -> unit;
 
+  fun init () = global_init(CURL_GLOBAL_ALL)
+
+  val cleanup = global_cleanup
 
   fun withCurl f = (
       global_init(CURL_GLOBAL_ALL);

@@ -55,7 +55,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
         )
 
 
-     fun add_request () = 
+     fun add_request () =
         case (!urls) of
              [] => ()
            | (u::us) => (

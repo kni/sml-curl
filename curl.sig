@@ -1,8 +1,10 @@
 signature CURL =
 sig
   exception Curl of int
-  val withCurl : (unit -> unit) -> unit
   val version : unit -> string
+  val init    : unit -> int
+  val cleanup : unit -> unit
+  val withCurl : (unit -> unit) -> unit
 
   structure Const : CURL_CONST
 

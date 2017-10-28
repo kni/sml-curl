@@ -9,6 +9,10 @@ struct
   val global_init    = buildCall1 ((getSymbol libcurl "curl_global_init"),  cInt, cInt)
   val global_cleanup = buildCall1 ((getSymbol libcurl "curl_global_cleanup"),  cVoid, cVoid)
 
+  fun init () = global_init(CURL_GLOBAL_ALL)
+
+  val cleanup = global_cleanup
+
   fun withCurl f = (
       global_init(CURL_GLOBAL_ALL);
       f () handle exc => print (exnMessage exc);
@@ -34,10 +38,10 @@ struct
     val init_ffi = buildCall1 ((getSymbol libcurl "curl_easy_init"),  cVoid, cPointer)
 
     fun init () =
-      let 
+      let
         val curl = init_ffi ()
       in
-        if curl = Memory.null 
+        if curl = Memory.null
         then raise Curl CURLE_FAILED_INIT
         else curl
       end
@@ -85,8 +89,8 @@ struct
 
         fun doit []      p = []
           | doit (x::xs) p =
-              let 
-                open Memory 
+              let
+                open Memory
                 val sp = ++(p, 0w2 * sizeofPointer)
                 val np = if List.null xs then null else ++(p, 0w2 * sizeofPointer + Word.fromInt(1 + String.size x))
               in
@@ -107,7 +111,7 @@ struct
 
     val getinfo_str_ffi  = buildCall3 ((getSymbol libcurl "curl_easy_getinfo"),  (cPointer, cInt, cStar cPointer), cInt)
 
-    fun getinfo_str(curl, info) = 
+    fun getinfo_str(curl, info) =
       let
         val pp = ref Memory.null
       in
@@ -118,7 +122,7 @@ struct
 
     val strerror_ffi  = buildCall1 ((getSymbol libcurl "curl_easy_strerror"),  cInt, cPointer)
 
-    val strerror = readCString o strerror_ffi 
+    val strerror = readCString o strerror_ffi
 
   end
 
@@ -132,10 +136,10 @@ struct
     val init_ffi = buildCall1 ((getSymbol libcurl "curl_multi_init"), cVoid, cPointer)
 
     fun init () =
-      let 
+      let
         val multi = init_ffi ()
       in
-        if multi = Memory.null 
+        if multi = Memory.null
         then raise Curl CURLE_FAILED_INIT
         else multi
       end
@@ -153,7 +157,7 @@ struct
         setopt_timer_cb_ffi(multi, CURLMOPT_TIMERFUNCTION, cb_ffi)
       end
 
-      
+
     val setopt_socket_cb_ffi = buildCall3 ((getSymbol libcurl "curl_multi_setopt"), (cPointer, cInt, cFunction), cInt)
 
     fun setopt_socket_cb(multi, cb) =
@@ -188,8 +192,8 @@ struct
         val msgs_in_queue = ref 0
         val msg_pointer = info_read_ffi(multi, msgs_in_queue)
       in
-        if msg_pointer = Memory.null 
-        then NONE 
+        if msg_pointer = Memory.null
+        then NONE
         else SOME (read_msg msg_pointer)
       end
 

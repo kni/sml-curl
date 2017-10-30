@@ -4,10 +4,10 @@ help:
 all: poly mlton ev-poly ev-mlton
 
 poly:
-	polyc -o t-poly t-poly.sml
+	polyc -o t-poly t.mlp
 
 ev-poly: ev
-	polyc -o t-ev-poly t-ev-poly.sml
+	polyc -o t-ev-poly t-ev.mlp
 
 mlton:
 	mlton -default-ann 'allowFFI true' -link-opt -lcurl -output t-mlton t.mlb

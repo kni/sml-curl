@@ -10,6 +10,7 @@ sig
   val CURLOPT_FOLLOWLOCATION  : int
   val CURLOPT_SSL_VERIFYPEER  : int
   val CURLOPT_SSL_VERIFYHOST  : int
+  val CURLOPT_FORBID_REUSE    : int
   val CURLOPT_MAXREDIRS       : int
   val CURLOPT_COOKIEFILE      : int
   val CURLOPT_USERAGENT       : int

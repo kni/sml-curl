@@ -15,6 +15,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
           (HttpFollowlocation true),
           (HttpSSLVerifyPeer false),
           (HttpSSLVerifyHost false),
+          (* (HttpForbidReuse true), *)
           (HttpMaxRedirs 5),
           (HttpCookieFile ""),
           (HttpUserAgent "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)"),

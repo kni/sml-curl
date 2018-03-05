@@ -56,7 +56,7 @@ struct
         | doit (HttpSSLVerifyHost true)   = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYHOST, 1)  ; NONE )
         | doit (HttpSSLVerifyHost false)  = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYHOST, 0)  ; NONE )
         | doit (HttpForbidReuse true)     = ( Easy.setopt_int(curl, CURLOPT_FORBID_REUSE, 1)    ; NONE )
-        | doit (HttpForbidReuse false)    = ( Easy.setopt_int(curl, CURLOPT_FORBID_REUSE, 1)    ; NONE )
+        | doit (HttpForbidReuse false)    = ( Easy.setopt_int(curl, CURLOPT_FORBID_REUSE, 0)    ; NONE )
         | doit (HttpMaxRedirs v)          = ( Easy.setopt_int(curl, CURLOPT_MAXREDIRS, v)       ; NONE )
         | doit (HttpCookieFile v)         = ( Easy.setopt_str(curl, CURLOPT_COOKIEFILE, v)      ; NONE )
         | doit (HttpUserAgent v)          = ( Easy.setopt_str(curl, CURLOPT_USERAGENT, v)       ; NONE )

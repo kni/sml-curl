@@ -161,7 +161,7 @@ struct
           val new_url =  Easy.getinfo_str(curl, CURLINFO_EFFECTIVE_URL)
         in
           onHead := NONE;
-          f (is_success, status, reason, new_url, headers, redirects)
+          f (is_success, status, reason, new_url, headers, redirects) handle exc => false
         end
 
       val body_ref = ref []
@@ -169,7 +169,7 @@ struct
       fun write_cb s = case on_head s of false  => 0 | true =>
         case (!onBody) of
              NONE   => ( body_ref := s::(!body_ref); String.size s )
-           | SOME f => if f s then String.size s else 0
+           | SOME f => (if f s then String.size s else 0) handle exc => 0
 
       val _ = Easy.setopt_cb(curl, CURLOPT_WRITEFUNCTION, write_cb)
 

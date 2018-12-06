@@ -62,8 +62,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
              urls := us;
              ev_continue := (!ev_continue) + 1;
              print ("Request: " ^ u ^ "\n");
-             doHttp (SOME curl_ev) u opt (cb add_request u);
-             ()
+             doHttpEv curl_ev u opt (cb add_request u)
            )
 
    in

@@ -30,10 +30,9 @@ fun main_handle () = Curl.withCurl ( fn () =>
           *)
         ]
 
-      fun cb(is_success, status, reason, new_url, body, headers, redirects) =
-        print ((Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^ " BodySize=" ^ (Int.toString(String.size body)) ^ "\n")
+      val (is_success, status, reason, new_url, body, headers, redirects) = doHttp "https://www.google.com/" opt
     in
-      doHttp NONE "https://www.google.com/" opt cb
+      print ((Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^ " BodySize=" ^ (Int.toString(String.size body)) ^ "\n")
     end
   )
 

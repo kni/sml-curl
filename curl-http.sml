@@ -17,10 +17,18 @@ sig
 
   type curl_ev_add_handle = Curl.Easy.curl * (Curl.Easy.curl * int -> unit) * int -> unit
 
-  type http_cb = ((bool * int * string * string * string * (string * string) list * (string * string) list list) -> unit)
+  type http_r = bool * int * string * string * string * (string * string) list * (string * string) list list
+  type http_cb = http_r -> unit
 
-  val doHttp: curl_ev_add_handle option -> string -> HttpOpt list -> http_cb -> unit
-end 
+  val doHttpEvCurl: curl_ev_add_handle -> Curl.Easy.curl -> string -> HttpOpt list -> http_cb -> unit
+
+  val doHttpEv: curl_ev_add_handle -> string -> HttpOpt list -> http_cb -> unit
+
+  val doHttpCurl: Curl.Easy.curl -> string -> HttpOpt list -> http_r
+
+  val doHttp: string -> HttpOpt list -> http_r
+
+end
 =
 struct
   open Curl Curl.Const
@@ -43,7 +51,8 @@ struct
 
   type curl_ev_add_handle = Easy.curl * (Easy.curl * int -> unit) * int -> unit
 
-  type http_cb = ((bool * int * string * string * string * (string * string) list * (string * string) list list) -> unit)
+  type http_r = bool * int * string * string * string * (string * string) list * (string * string) list list
+  type http_cb = http_r -> unit
 
   fun setHttpOpt curl onHead onBody opt =
     let
@@ -78,12 +87,11 @@ struct
   (* val timeout = timeout_option opt *)
   fun timeout_option []      = 5 * 60
     | timeout_option (x::xs) = case x of (HttpTimeout t) => t | _ => timeout_option xs
-     
 
-  fun doHttp curl_ev url opt cb =
+
+  fun doHttp' curl_ev curl url opt cb =
     let
-      val curl = Easy.init ()
-      
+
       val _ = Easy.setopt_str(curl, CURLOPT_URL, url)
 
       val onHead = ref NONE
@@ -115,12 +123,12 @@ struct
               val t  = List.tl hs
 
               val hh = List.foldl (fn(s,r) =>
-                  let 
+                  let
                     val (n, v) = split_by_colon(chomp s)
                     val v = drop_l_space v
-                  in 
-                    ((Substring.string(n), Substring.string(v))::r) 
-                  end 
+                  in
+                    ((Substring.string(n), Substring.string(v))::r)
+                  end
                 ) [] t
 
               val (version, ft)    = split_space f
@@ -143,8 +151,8 @@ struct
 
         in
           case Int.fromString status of
-               NONE        => (599, "Status in not number", h, r) 
-             | SOME status => (status, reason, h, r) 
+               NONE        => (599, "Status in not number", h, r)
+             | SOME status => (status, reason, h, r)
         end
       )
 
@@ -183,7 +191,6 @@ struct
           let
             val reason = Easy.strerror(result)
           in
-            Easy.cleanup(curl);
             free ();
             cb(false, 500, reason, "", "", [("Status", "500"), ("Reason", reason)], [])
           end
@@ -197,7 +204,6 @@ struct
           in
             if result = CURLE_OK
             then (
-                Easy.cleanup(curl);
                 free ();
                 cb(is_success, status, reason, new_url, body, headers, redirects)
               )
@@ -205,16 +211,47 @@ struct
               let
                 val reason = Easy.strerror(result)
               in
-                Easy.cleanup(curl);
                 free ();
                 cb(false, 599, reason, new_url, body, headers, redirects)
               end
           end
         )
-      
+
     in
       case curl_ev of
-          NONE         => ( finish (curl, Easy.perform(curl)) )
-        | SOME curl_ev => ( curl_ev(curl, finish, (timeout_option opt)) )
+          NONE         => finish  (curl, Easy.perform curl)
+        | SOME curl_ev => curl_ev (curl, finish, timeout_option opt)
     end
+
+
+
+  fun doHttpEvCurl curl_ev curl url opt cb = doHttp' (SOME curl_ev) curl url opt cb
+
+
+  fun doHttpEv curl_ev url opt cb =
+    let
+      val curl = Easy.init ()
+    in
+      doHttp' (SOME curl_ev) curl url opt (fn r => (Easy.cleanup curl; cb r))
+    end
+
+
+  fun doHttpCurl curl url opt =
+    let
+      val r' = ref NONE
+    in
+      doHttp' NONE curl url opt (fn r => r' := SOME r);
+      valOf (!r')
+    end
+
+
+  fun doHttp url opt =
+    let
+      val curl = Easy.init ()
+      val r = doHttpCurl curl url opt
+    in
+      Easy.cleanup curl;
+      r
+    end
+
 end

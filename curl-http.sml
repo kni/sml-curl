@@ -15,18 +15,18 @@ sig
                    | HttpOnHead             of (bool * int * string * string * (string * string) list * (string * string) list list) -> bool
                    | HttpOnBody             of string -> bool
 
-  type curl_ev_add_handle = Curl.Easy.curl * (Curl.Easy.curl * int -> unit) * int -> unit
+  type curlEvAddHandle = Curl.Easy.curl * (Curl.Easy.curl * int -> unit) * int -> unit
 
-  type http_r = bool * int * string * string * string * (string * string) list * (string * string) list list
-  type http_cb = http_r -> unit
+  type httpR = bool * int * string * string * string * (string * string) list * (string * string) list list
+  type httpCb = httpR -> unit
 
-  val doHttpEvCurl: curl_ev_add_handle -> Curl.Easy.curl -> string -> HttpOpt list -> http_cb -> unit
+  val doHttpEvCurl: curlEvAddHandle -> Curl.Easy.curl -> string -> HttpOpt list -> httpCb -> unit
 
-  val doHttpEv: curl_ev_add_handle -> string -> HttpOpt list -> http_cb -> unit
+  val doHttpEv: curlEvAddHandle -> string -> HttpOpt list -> httpCb -> unit
 
-  val doHttpCurl: Curl.Easy.curl -> string -> HttpOpt list -> http_r
+  val doHttpCurl: Curl.Easy.curl -> string -> HttpOpt list -> httpR
 
-  val doHttp: string -> HttpOpt list -> http_r
+  val doHttp: string -> HttpOpt list -> httpR
 
 end
 =
@@ -49,10 +49,10 @@ struct
                    | HttpOnBody             of string -> bool
 
 
-  type curl_ev_add_handle = Easy.curl * (Easy.curl * int -> unit) * int -> unit
+  type curlEvAddHandle = Easy.curl * (Easy.curl * int -> unit) * int -> unit
 
-  type http_r = bool * int * string * string * string * (string * string) list * (string * string) list list
-  type http_cb = http_r -> unit
+  type httpR = bool * int * string * string * string * (string * string) list * (string * string) list list
+  type httpCb = httpR -> unit
 
   fun setHttpOpt curl onHead onBody opt =
     let
@@ -78,7 +78,7 @@ struct
 
       val free_setopt_list = List.foldl (fn (opt, free) => case doit opt of NONE => free | SOME f => f::free) [] opt
 
-      val free = fn () => List.foldl (fn (f,_) => (f ())) () free_setopt_list
+      fun free () = List.foldl (fn (f,_) => f ()) () free_setopt_list
     in
       free
     end
@@ -91,7 +91,6 @@ struct
 
   fun prepare curl url opt =
     let
-
       val _ = Easy.setopt_str(curl, CURLOPT_URL, url)
 
       val onHead = ref NONE

@@ -126,7 +126,7 @@ struct
                     val (n, v) = split_by_colon (chomp s)
                     val v = drop_l_space v
                   in
-                    ((Substring.string n, Substring.string v)::r)
+                    (String.map Char.toLower (Substring.string n), Substring.string v)::r
                   end
                 ) [] t
 

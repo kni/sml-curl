@@ -133,7 +133,7 @@ struct
               val (version, ft)    = split_space f
               val (status, reason) = split_space ft
             in
-              ("Status", Substring.string status)::("Reason", Substring.string reason)::hh
+              ("Protocol", Substring.string version)::("Status", Substring.string status)::("Reason", Substring.string reason)::hh
             end
 
           fun doit []      b c = c

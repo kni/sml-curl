@@ -30,9 +30,28 @@ fun main_handle () = Curl.withCurl ( fn () =>
           *)
         ]
 
-      val (is_success, status, reason, new_url, body, headers, redirects) = doHttp "https://www.google.com/" opt
+      fun getHeader h [] = "-"
+        | getHeader h ((n,v)::hs) = if h = n then v else getHeader h hs
+
+      fun printResult (is_success, status, reason, new_url, body, headers, redirects) =
+          print ((Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^
+            " BodySize=" ^ (Int.toString(String.size body)) ^
+            " Protocol=" ^ (getHeader "Protocol" headers) ^
+            " Connection=" ^ (getHeader "connection" headers) ^
+            "\n"
+          )
+
     in
-      print ((Int.toString status) ^ " (" ^ reason ^ ") " ^ new_url ^ " BodySize=" ^ (Int.toString(String.size body)) ^ "\n")
+      printResult (doHttp "https://www.google.com/" opt);
+
+      let
+        val curl = Curl.Easy.init ()
+      in
+        printResult (doHttpCurl curl "https://www.bing.com/" opt);
+        printResult (doHttpCurl curl "https://www.yahoo.com/" opt);
+        printResult (doHttpCurl curl "http://sml-family.org/" opt);
+        Curl.Easy.cleanup curl
+      end
     end
   )
 

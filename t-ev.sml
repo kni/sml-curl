@@ -4,7 +4,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
       val _ = print ((Curl.version ()) ^ "\n")
 
       open Curl
-      open EvWithTimer
+      open Ev
 
       val ev = evInit ()
 

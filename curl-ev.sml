@@ -8,7 +8,7 @@ end =
 struct
   exception CurlEv of string
   open Curl Curl.Const
-  open EvWithTimer
+  open Ev
   structure H = HashArrayLargeInt
   type easy = Easy.curl
   type multi = Multi.multi

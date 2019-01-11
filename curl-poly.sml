@@ -6,8 +6,8 @@ struct
   open Foreign
   val libcurl = loadLibrary "libcurl.so"
 
-  val global_init    = buildCall1 ((getSymbol libcurl "curl_global_init"),  cInt, cInt)
-  val global_cleanup = buildCall1 ((getSymbol libcurl "curl_global_cleanup"),  cVoid, cVoid)
+  val global_init    = buildCall1 ((getSymbol libcurl "curl_global_init"),   cInt, cInt)
+  val global_cleanup = buildCall0 ((getSymbol libcurl "curl_global_cleanup"),  (), cVoid)
 
   fun init () = global_init(CURL_GLOBAL_ALL)
 
@@ -35,7 +35,7 @@ struct
   struct
     type curl = Memory.voidStar
 
-    val init_ffi = buildCall1 ((getSymbol libcurl "curl_easy_init"),  cVoid, cPointer)
+    val init_ffi = buildCall0 ((getSymbol libcurl "curl_easy_init"),  (), cPointer)
 
     fun init () =
       let
@@ -133,7 +133,7 @@ struct
 
     val easy2int = SysWord.toLargeInt o Foreign.Memory.voidStar2Sysword
 
-    val init_ffi = buildCall1 ((getSymbol libcurl "curl_multi_init"), cVoid, cPointer)
+    val init_ffi = buildCall0 ((getSymbol libcurl "curl_multi_init"), (), cPointer)
 
     fun init () =
       let

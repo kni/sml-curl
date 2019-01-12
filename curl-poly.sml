@@ -65,7 +65,7 @@ struct
             cb s
           end
 
-        val cb_ffi = buildClosure4 (cb_low, (cPointer, cInt, cInt, cVoid), cInt)
+        val cb_ffi = buildClosure4 (cb_low, (cPointer, cInt, cInt, cPointer), cInt)
       in
         setopt_cb_ffi(curl, opt, cb_ffi)
       end
@@ -152,7 +152,7 @@ struct
     fun setopt_timer_cb(multi, cb) =
       let
         fun cb_low (multi, timeout_ms, _) = cb(multi, timeout_ms)
-        val cb_ffi = buildClosure3 (cb_low, (cPointer, cLong, cVoid), cInt)
+        val cb_ffi = buildClosure3 (cb_low, (cPointer, cLong, cPointer), cInt)
       in
         setopt_timer_cb_ffi(multi, CURLMOPT_TIMERFUNCTION, cb_ffi)
       end
@@ -163,7 +163,7 @@ struct
     fun setopt_socket_cb(multi, cb) =
       let
        fun cb_low(easy, socket, poll, _, _) = cb(easy, socket, poll)
-        val cb_ffi = buildClosure5 (cb_low, (cPointer, cInt, cInt, cVoid, cVoid), cInt)
+        val cb_ffi = buildClosure5 (cb_low, (cPointer, cInt, cInt, cPointer, cPointer), cInt)
       in
         setopt_socket_cb_ffi(multi, CURLMOPT_SOCKETFUNCTION, cb_ffi)
       end

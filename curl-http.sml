@@ -160,10 +160,13 @@ struct
       fun header_cb s = (headers_ref := s::(!headers_ref) ; String.size s)
       val _ = Easy.setopt_cb(curl, CURLOPT_HEADERFUNCTION, header_cb)
 
+      val headers_parsed_ref = ref NONE
 
       fun on_head s = case (!onHead) of NONE => true | SOME f =>
         let
-          val (status, reason, headers, redirects) = headers_parse (List.rev(!headers_ref))
+          val hs = headers_parse (List.rev(!headers_ref))
+          val _ = headers_parsed_ref := SOME hs
+          val (status, reason, headers, redirects) = hs
           val is_success = status >= 200 andalso status < 300
           val new_url =  Easy.getinfo_str (curl, CURLINFO_EFFECTIVE_URL)
         in
@@ -199,7 +202,7 @@ struct
           end
         else
           let
-            val (status, reason, headers, redirects) = headers_parse (List.rev(!headers_ref))
+            val (status, reason, headers, redirects) = case !headers_parsed_ref of NONE => headers_parse (List.rev(!headers_ref)) | SOME hs => hs
             (* val _ = printHeaders (headers::redirects) *)
             val is_success = status >= 200 andalso status < 300
             val new_url =  Easy.getinfo_str(curl, CURLINFO_EFFECTIVE_URL)

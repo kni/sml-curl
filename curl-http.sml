@@ -1,7 +1,7 @@
 structure CurlHTTP :
 sig
   datatype HttpOpt = HttpVerbose            of bool
-                   | HttpFollowlocation     of bool
+                   | HttpFollowLocation     of bool
                    | HttpSSLVerifyPeer      of bool
                    | HttpSSLVerifyHost      of bool
                    | HttpForbidReuse        of bool
@@ -34,7 +34,7 @@ struct
   open Curl Curl.Const
 
   datatype HttpOpt = HttpVerbose            of bool
-                   | HttpFollowlocation     of bool
+                   | HttpFollowLocation     of bool
                    | HttpSSLVerifyPeer      of bool
                    | HttpSSLVerifyHost      of bool
                    | HttpForbidReuse        of bool
@@ -58,8 +58,8 @@ struct
     let
       fun doit (HttpVerbose true)         = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 1)         ; NONE )
         | doit (HttpVerbose false)        = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 0)         ; NONE )
-        | doit (HttpFollowlocation true)  = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 1)  ; NONE )
-        | doit (HttpFollowlocation false) = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 0)  ; NONE )
+        | doit (HttpFollowLocation true)  = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 1)  ; NONE )
+        | doit (HttpFollowLocation false) = ( Easy.setopt_int(curl, CURLOPT_FOLLOWLOCATION, 0)  ; NONE )
         | doit (HttpSSLVerifyPeer true)   = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYPEER, 1)  ; NONE )
         | doit (HttpSSLVerifyPeer false)  = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYPEER, 0)  ; NONE )
         | doit (HttpSSLVerifyHost true)   = ( Easy.setopt_int(curl, CURLOPT_SSL_VERIFYHOST, 1)  ; NONE )

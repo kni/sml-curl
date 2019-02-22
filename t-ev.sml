@@ -22,7 +22,6 @@ fun main_handle () = Curl.withCurl ( fn () =>
           "http://www.polyml.org/",
           "http://www.mlton.org/",
           "http://melsman.github.io/mlkit",
-          "http://www.smlserver.org",
           "http://www.mpi-sws.org/~rossberg/hamlet/",
           "http://www.smlnj.org/",
           "http://www.pllab.riec.tohoku.ac.jp/smlsharp/",

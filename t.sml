@@ -12,7 +12,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
 
       val opt = [
           (* (HttpVerbose true), *)
-          (HttpFollowlocation true),
+          (HttpFollowLocation true),
           (HttpSSLVerifyPeer false),
           (HttpSSLVerifyHost false),
           (* (HttpForbidReuse true), *)

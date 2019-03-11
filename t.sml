@@ -22,7 +22,8 @@ fun main_handle () = Curl.withCurl ( fn () =>
           (* (HttpProxy "127.0.0.1:3128"), *)
           (HttpTimeout 30),
           (HttpAcceptEncoding "gzip"),
-          (HttpHeaders [("Accept", "*/*"), ("Accept-Language", "*")])
+          (HttpHeaders [("Accept", "*/*"), ("Accept-Language", "*")]),
+          (HttpMaxSize (5 * 1025 * 1024))
 
           (* 
           , (HttpOnHead onHead)

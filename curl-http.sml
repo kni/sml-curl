@@ -11,6 +11,7 @@ sig
                    | HttpTimeout            of int
                    | HttpProxy              of string
                    | HttpAcceptEncoding     of string
+                   | HttpMaxSize            of int
                    | HttpHeaders            of (string * string) list
                    | HttpOnHead             of (bool * int * string * string * (string * string) list * (string * string) list list) -> bool
                    | HttpOnBody             of string -> bool
@@ -44,6 +45,7 @@ struct
                    | HttpTimeout            of int
                    | HttpProxy              of string
                    | HttpAcceptEncoding     of string
+                   | HttpMaxSize            of int
                    | HttpHeaders            of (string * string) list
                    | HttpOnHead             of (bool * int * string * string * (string * string) list * (string * string) list list) -> bool
                    | HttpOnBody             of string -> bool
@@ -54,7 +56,7 @@ struct
   type httpR = bool * int * string * string * string * (string * string) list * (string * string) list list
   type httpCb = httpR -> unit
 
-  fun setHttpOpt curl onHead onBody opt =
+  fun setHttpOpt curl onHead onBody maxSize opt =
     let
       fun doit (HttpVerbose true)         = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 1)         ; NONE )
         | doit (HttpVerbose false)        = ( Easy.setopt_int(curl, CURLOPT_VERBOSE, 0)         ; NONE )
@@ -72,6 +74,7 @@ struct
         | doit (HttpProxy v)              = ( Easy.setopt_str(curl, CURLOPT_PROXY, v)           ; NONE )
         | doit (HttpTimeout v)            = ( Easy.setopt_int(curl, CURLOPT_TIMEOUT, v)         ; NONE )
         | doit (HttpAcceptEncoding v)     = ( Easy.setopt_str(curl, CURLOPT_ACCEPT_ENCODING, v) ; NONE )
+        | doit (HttpMaxSize v)            = ( maxSize := v ; NONE )
         | doit (HttpHeaders l)            = SOME (Easy.setopt_list(curl, CURLOPT_HTTPHEADER, (List.map (fn (n,v) => (n ^ ": " ^ v) ) l)))
         | doit (HttpOnHead f)             = ( onHead := SOME f ; NONE )
         | doit (HttpOnBody f)             = ( onBody := SOME f ; NONE )
@@ -95,8 +98,9 @@ struct
 
       val onHead = ref NONE
       val onBody = ref NONE
+      val maxSize = ref 0
 
-      val free = setHttpOpt curl onHead onBody opt
+      val free = setHttpOpt curl onHead onBody maxSize opt
 
 
       fun headers_parse headers = (
@@ -155,7 +159,6 @@ struct
         end
       )
 
-
       val headers_ref = ref []
       fun header_cb s = (headers_ref := s::(!headers_ref) ; String.size s)
       val _ = Easy.setopt_cb(curl, CURLOPT_HEADERFUNCTION, header_cb)
@@ -164,7 +167,7 @@ struct
 
       fun on_head s = case (!onHead) of NONE => true | SOME f =>
         let
-          val hs = headers_parse (List.rev(!headers_ref))
+          val hs = headers_parse (List.rev (!headers_ref))
           val _ = headers_parsed_ref := SOME hs
           val (status, reason, headers, redirects) = hs
           val is_success = status >= 200 andalso status < 300
@@ -174,12 +177,20 @@ struct
           f (is_success, status, reason, new_url, headers, redirects) handle exc => false
         end
 
+      val respSize = ref 0
       val body_ref = ref []
 
-      fun write_cb s = case on_head s of false  => 0 | true =>
-        case (!onBody) of
-             NONE   => ( body_ref := s::(!body_ref); String.size s )
-           | SOME f => (if f s then String.size s else 0) handle exc => 0
+      fun write_cb s =
+        let
+          val size = String.size s
+        in
+          respSize := (!respSize) + size;
+          if (!maxSize) > 0 andalso (!maxSize) < (!respSize) then 0 else
+          case on_head s of false  => 0 | true =>
+          case (!onBody) of
+               NONE   => ( body_ref := s::(!body_ref); size )
+             | SOME f => (if f s then size else 0) handle exc => 0
+        end
 
       val _ = Easy.setopt_cb (curl, CURLOPT_WRITEFUNCTION, write_cb)
 

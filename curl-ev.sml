@@ -90,13 +90,11 @@ struct
 
 
       val timerId = evTimerNew ev
-      val timerLoopVal = ref (Time.fromMilliseconds 1)
-      fun timerLoop () = evTimerAdd ev (timerId, (!timerLoopVal), fn () => ( cb_timeout (); timerLoop () ))
 
       fun cb_timer(multi, timeout_ms) = (
         if timeout_ms < 0
-        then ( timerLoopVal := Time.fromSeconds 10 )
-        else ( timerLoopVal := Time.fromMilliseconds (Int.toLarge timeout_ms); timerLoop () )
+        then ()
+        else evTimerAdd ev (timerId, (Time.fromMilliseconds (Int.toLarge timeout_ms)), cb_timeout)
         ; 1)
 
 
@@ -114,7 +112,6 @@ struct
     in
       Multi.setopt_socket_cb(multi, cb_socket);
       Multi.setopt_timer_cb(multi, cb_timer);
-      timerLoop();
       add_handle
     end
 end

@@ -90,12 +90,20 @@ struct
 
 
       val timerId = evTimerNew ev
+      val timerLoopVal = ref (Time.fromSeconds 10)
+      fun timerLoop () = evTimerAdd ev (timerId, !timerLoopVal, fn () => ( cb_timeout (); timerLoop () ))
 
       fun cb_timer(multi, timeout_ms) = (
-        if timeout_ms < 0
-        then ()
-        else evTimerAdd ev (timerId, (Time.fromMilliseconds (Int.toLarge timeout_ms)), cb_timeout)
+        if timeout_ms < 0 then timerLoopVal := Time.fromSeconds 10 else
+        if timeout_ms = 0 then timerLoopVal := Time.fromMicroseconds 10 else
+                               timerLoopVal := Time.fromMilliseconds (Int.toLarge timeout_ms)
+        ; timerLoop ()
         ; 1)
+        (*
+        https://curl.haxx.se/mail/lib-2019-03/0125.html
+        Because of this 10 microseconds used for 0.
+        By the way, libev use 1 microsecond for 0.
+        *)
 
 
       fun cb_socket(easy, socket, poll) = (
@@ -112,6 +120,7 @@ struct
     in
       Multi.setopt_socket_cb(multi, cb_socket);
       Multi.setopt_timer_cb(multi, cb_timer);
+      timerLoop ();
       add_handle
     end
 end

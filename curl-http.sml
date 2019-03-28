@@ -214,10 +214,12 @@ struct
         else
           let
             val (status, reason, headers, redirects) = case !headers_parsed_ref of NONE => headers_parse (List.rev(!headers_ref)) | SOME hs => hs
+            val _ = headers_ref := []
             (* val _ = printHeaders (headers::redirects) *)
             val is_success = status >= 200 andalso status < 300
             val new_url =  Easy.getinfo_str(curl, CURLINFO_EFFECTIVE_URL)
             val body = String.concat (List.rev (!body_ref))
+            val _ = body_ref := []
           in
             if result = CURLE_OK
             then (

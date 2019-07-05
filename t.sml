@@ -1,5 +1,5 @@
 open CurlHTTP
-fun main_handle () = Curl.withCurl ( fn () => 
+fun main_handle () = Curl.withCurl ( fn () =>
     let
       val _ = print ((Curl.version ()) ^ "\n")
 
@@ -25,7 +25,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
           (HttpHeaders [("Accept", "*/*"), ("Accept-Language", "*")]),
           (HttpMaxSize (5 * 1025 * 1024))
 
-          (* 
+          (*
           , (HttpOnHead onHead)
           , (HttpOnBody onBody)
           *)

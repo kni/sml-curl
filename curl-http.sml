@@ -95,7 +95,6 @@ struct
   fun prepare curl url opt =
     let
       val _ = Easy.setopt_str(curl, CURLOPT_URL, url)
-      val _ = Easy.setopt_int(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1)
 
       val onHead = ref NONE
       val onBody = ref NONE

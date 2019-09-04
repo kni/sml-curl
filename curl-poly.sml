@@ -78,7 +78,8 @@ struct
 
     val malloc = Memory.malloc o Word.fromInt
 
-    fun setopt_list(curl, opt, l) =
+    fun setopt_list(curl, opt, []) = (setopt_list_ffi(curl, opt, Memory.null); fn () => ())
+      | setopt_list(curl, opt, l) =
       let
         val l = List.map String.toCString l
 

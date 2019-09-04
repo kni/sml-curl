@@ -262,7 +262,7 @@ struct
 
   fun doHttpCurl curl url opt =
     let
-      val finish = prepare curl url opt;
+      val finish = prepare curl url opt
     in
       finish (curl, Easy.perform curl)
     end

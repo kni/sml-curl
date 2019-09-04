@@ -1,5 +1,5 @@
 open CurlHTTP
-fun main_handle () = Curl.withCurl ( fn () => 
+fun main_handle () = Curl.withCurl ( fn () =>
     let
       val _ = print ((Curl.version ()) ^ "\n")
 

@@ -152,7 +152,8 @@ struct
 
     val setopt_list_ffi  = _import "curl_easy_setopt": t * int * t -> int;
 
-    fun setopt_list(curl, opt, l) =
+    fun setopt_list(curl, opt, []) = (setopt_list_ffi(curl, opt, null); fn () => ())
+      | setopt_list(curl, opt, l) =
       let
         val l = List.map String.toCString l
 

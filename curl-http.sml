@@ -96,6 +96,10 @@ struct
     let
       val _ = Easy.setopt_str(curl, CURLOPT_URL, url)
 
+      val CURLOPT_HTTP_VERSION  = 84
+      val CURL_HTTP_VERSION_1_1 = 2
+      val _ = Easy.setopt_int(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1)
+
       val onHead = ref NONE
       val onBody = ref NONE
       val maxSize = ref 0

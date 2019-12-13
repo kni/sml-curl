@@ -179,7 +179,7 @@ struct
       in
         doit l mem;
         setopt_list_ffi(curl, opt, mem);
-        fn () => free mem
+        fn () => (setopt_list_ffi(curl, opt, null); free mem)
       end
 
 

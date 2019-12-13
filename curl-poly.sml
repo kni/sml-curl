@@ -105,7 +105,7 @@ struct
       in
         doit l mem;
         setopt_list_ffi(curl, opt, mem);
-        fn () => Memory.free mem
+        fn () => (setopt_list_ffi(curl, opt, Memory.null); Memory.free mem)
       end
 
 

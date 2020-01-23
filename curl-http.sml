@@ -81,7 +81,7 @@ struct
 
       val free_setopt_list = List.foldl (fn (opt, free) => case doit opt of NONE => free | SOME f => f::free) [] opt
 
-      fun free () = List.foldl (fn (f,_) => f ()) () free_setopt_list
+      fun free () = List.app (fn f => f ()) free_setopt_list
     in
       free
     end

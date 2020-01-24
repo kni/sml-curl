@@ -1,6 +1,9 @@
-use "ev/hash-array-int.sml";
-use "ev/ev-kqueue-poly.sml";
-use "ev/ev-with-timer.sml";
+val p = getOpt (OS.Process.getEnv "USER_SML_LIB", ".") ^ "/";
+
+use (p ^ "ev/hash-array-int.sml");
+use (p ^ "ev/ev-kqueue-poly.sml");
+use (p ^ "ev/ev-with-timer.sml");
+
 use "hash-array-large-int.sml";
 use "curl-const.sig";
 use "curl.sig";

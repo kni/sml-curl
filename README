@@ -1,6 +1,6 @@
 sml-curl - libcurl for Standard ML and http client with asynchronous support (via sml-ev)
 
-It is for Poly/ML and MLton, *BSD and Linix.
+It is for Poly/ML and MLton, *BSD and Linux.
 
  curl-const.sig and curl.sig
  curl-{poly,mlton}.sml - Curl.Const, Curl.Easy, Curl.Multi structures
@@ -14,6 +14,8 @@ To use asynchronous curl-http you should get https://github.com/kni/sml-ev (make
 
 To build all test - make poly mlton ev-poly ev-mlton.
 For Linux: replace kqueue on epoll in t-ev.sml.
+
+To download depends and build: make depends && make USER_SML_LIB=lib all
 
 Files for build t.sml and t-ev.sml:
 poly)  t-poly.sml and t-ev-poly.sml

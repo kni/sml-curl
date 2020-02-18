@@ -3,10 +3,9 @@ local
     $(SML_LIB)/basis/basis.mlb
     $(SML_LIB)/basis/c-types.mlb
 in
-    $(USER_SML_LIB)/ev/hash-array-int.sml
+    $(USER_SML_LIB)/ev/hash-array.sml
     $(USER_SML_LIB)/ev/ev-kqueue-mlton.sml
     $(USER_SML_LIB)/ev/ev-with-timer.sml
-    hash-array-large-int.sml
     curl-const.sig
     curl.sig
     curl-const.sml

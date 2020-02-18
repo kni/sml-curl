@@ -3,7 +3,7 @@ local
     $(SML_LIB)/basis/basis.mlb
     $(SML_LIB)/basis/c-types.mlb
 in
-    hash-array-large-int.sml
+    hash-array.sml
     curl-const.sig
     curl.sig
     curl-const.sml

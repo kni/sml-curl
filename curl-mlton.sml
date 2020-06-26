@@ -17,8 +17,8 @@ struct
 
   fun withCurl f = (
       global_init(CURL_GLOBAL_ALL);
-      f () handle exc => print (exnMessage exc);
-      global_cleanup()
+      f () handle exc => (global_cleanup (); raise exc);
+      global_cleanup ()
     )
 
   fun readCString p =

@@ -38,7 +38,7 @@ fun main_handle () = Curl.withCurl ( fn () =>
           (HttpUserAgent "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)"),
           (* (HttpProxy "127.0.0.1:3128"), *)
           (HttpTimeout 30),
-          (HttpAcceptEncoding "gzip"),
+          (HttpAcceptEncoding ""),
           (HttpHeaders [("Accept", "*/*"), ("Accept-Language", "*")])
         ]
 

@@ -65,7 +65,7 @@ struct
             cb s
           end
 
-        val cb_ffi = buildClosure4 (cb_low, (cPointer, cInt, cInt, cPointer), cInt)
+        val cb_ffi = buildClosure4 (cb_low, (cPointer, cInt, cInt, cPointer), cSize)
       in
         setopt_cb_ffi(curl, opt, cb_ffi)
       end

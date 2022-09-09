@@ -90,10 +90,10 @@ struct
 
     val setopt_cb_ffi = _import "curl_easy_setopt" reentrant: t * int * t -> int;
 
-    val curlopt_headerfunction_cb_export = _export  "curlopt_headerfunction_cb": (t * int * int * t -> int) -> unit;
+    val curlopt_headerfunction_cb_export = _export  "curlopt_headerfunction_cb": (t * int * int * t -> C_Size.t) -> unit;
     val curlopt_headerfunction_cb        = _address "curlopt_headerfunction_cb" public: t;
 
-    val curlopt_writefunction_cb_export  = _export  "curlopt_writefunction_cb": (t * int * int * t -> int) -> unit;
+    val curlopt_writefunction_cb_export  = _export  "curlopt_writefunction_cb": (t * int * int * t -> C_Size.t) -> unit;
     val curlopt_writefunction_cb         = _address "curlopt_writefunction_cb" public: t;
 
           fun cb_low_h_f (ptr, size, nmemb, curl) =
@@ -105,7 +105,7 @@ struct
               val easy_int = easy2int curl
               val cb = valOf(H.sub(headerfunction_cb_H, easy_int))
             in
-              cb s
+              C_Size.fromInt (cb s)
             end
 
           fun cb_low_w_f (ptr, size, nmemb, curl) =
@@ -117,7 +117,7 @@ struct
               val easy_int = easy2int curl
               val cb = valOf(H.sub(writefunction_cb_H, easy_int))
             in
-              cb s
+              C_Size.fromInt (cb s)
             end
 
     val _ = curlopt_headerfunction_cb_export cb_low_h_f

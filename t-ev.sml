@@ -28,6 +28,11 @@ fun main_handle () = Curl.withCurl ( fn () =>
           "http://manticore.cs.uchicago.edu/"
         ]
 
+      fun doUrl 0 = []
+        | doUrl n = "https://edition.cnn.com/"::"https://www.bbc.com/"::(doUrl (n - 1))
+
+      (* val urls = ref (doUrl 3) *)
+
       val opt = [
           (* (HttpVerbose true), *)
           (HttpFollowLocation true),
@@ -64,12 +69,11 @@ fun main_handle () = Curl.withCurl ( fn () =>
              doHttpEv curl_ev u opt (cb add_request u)
            )
 
+     fun doN f 0 = ()
+       | doN f n = ( f (); doN f (n - 1) )
+
    in
-     add_request ();
-     add_request ();
-     add_request ();
-     add_request ();
-     add_request ();
+     doN add_request 5;
      while (!ev_continue) > 0 do evWait ev (SOME (Time.fromSeconds 3));
      Multi.cleanup multi;
      ()

@@ -149,12 +149,11 @@ struct
 
 
           val gh = doit headers [] []
-          val h = List.hd gh
-          val r = List.tl gh
+          val (h, r) = case gh of (h::r) => (h, r) | _ => ([], [])
 
           fun get_h name hs = case List.find (fn(n,v) => n = name) hs of NONE => NONE | SOME (n, v) => SOME v
-          val status = valOf (get_h "Status" h)
-          val reason = valOf (get_h "Reason" h)
+          val status = getOpt ((get_h "Status" h), "")
+          val reason = getOpt ((get_h "Reason" h), "")
 
         in
           case Int.fromString status of

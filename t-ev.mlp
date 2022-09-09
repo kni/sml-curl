@@ -1,13 +1,13 @@
 val p = getOpt (OS.Process.getEnv "USER_SML_LIB", ".") ^ "/";
 
 use (p ^ "ev/hash-array.sml");
-use (p ^ "ev/ev-kqueue-poly.sml");
+use (p ^ "ev/ev-kqueue-polyml.sml");
 use (p ^ "ev/ev-with-timer.sml");
 
 use "curl-const.sig";
 use "curl.sig";
 use "curl-const.sml";
-use "curl-poly.sml";
+use "curl-polyml.sml";
 use "curl-ev.sml";
 use "curl-http.sml";
 use "t-ev.sml";

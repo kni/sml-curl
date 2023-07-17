@@ -7,6 +7,7 @@ struct
 
   val CURLE_FAILED_INIT     = 2
   val CURLE_COULDNT_CONNECT = 7
+  val CURLE_OPERATION_TIMEDOUT = 28
 
 
   val CURLOPT_URL             = 10002

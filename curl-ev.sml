@@ -28,11 +28,11 @@ struct
           fun info_read () =
             let
               fun doFinish easy result =
-                let 
+                let
                   val easy_int = Multi.easy2int easy
                   val finish = valOf(H.sub(finishH, easy_int))
                   val timer_id_Option = H.sub(timerH, easy_int)
-                in 
+                in
                   H.delete(timerH, easy_int);
                   H.delete(finishH, easy_int);
                   (case timer_id_Option of NONE => () | SOME timer_id => evTimerDelete ev timer_id);
@@ -42,11 +42,11 @@ struct
               case Multi.info_read(multi) of
                    NONE => ()
                  | SOME (msg, easy, result) =>
-                     if msg = CURLMSG_DONE 
+                     if msg = CURLMSG_DONE
                      then (doFinish easy result; info_read () )
                      else raise (CurlEv ("I don't know what to do with message: " ^ Int.toString(msg)))
             end
-           
+
         in
           if (!multi_active) = active then () else ( multi_active := active; info_read () )
         end
@@ -72,15 +72,15 @@ struct
                     H.delete(timerH, easy_int);
                     H.delete(finishH, easy_int);
                     Multi.remove_handle(multi, easy);
-                    finish (easy:Curl.Easy.curl, CURLE_COULDNT_CONNECT)
+                    finish (easy:Curl.Easy.curl, CURLE_OPERATION_TIMEDOUT)
                   end
 
         in
           Multi.add_handle(multi, easy);
           evTimerAdd ev (add_handle_timer_id, Time.fromMilliseconds 1, cb_timeout);
 
-          if timeout = 0 then () else 
-          let 
+          if timeout = 0 then () else
+          let
             val timer_id = evTimerNew ev
           in
             evTimerAdd ev (timer_id, Time.fromSeconds(Int.toLarge timeout), cb_big_timeout );

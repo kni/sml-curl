@@ -6,6 +6,7 @@ sig
   val CURL_GLOBAL_ALL : int
   val CURLE_FAILED_INIT     : int
   val CURLE_COULDNT_CONNECT : int
+  val CURLE_OPERATION_TIMEDOUT : int
   val CURLOPT_URL             : int
   val CURLOPT_FOLLOWLOCATION  : int
   val CURLOPT_SSL_VERIFYPEER  : int

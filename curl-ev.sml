@@ -109,12 +109,14 @@ struct
       fun cb_socket(easy, socket, poll) = (
         if poll = CURL_POLL_IN orelse poll = CURL_POLL_INOUT
         then evModify ev [evAdd (socket, evRead, (fn (_,_) => socket_action(socket, CURL_CSELECT_IN) ))]
-        else evModify ev [evDelete (socket, evRead)]
-        ;
+        else 1;
         if poll = CURL_POLL_OUT orelse poll = CURL_POLL_INOUT
         then evModify ev [evAdd (socket, evWrite, (fn (_,_) => socket_action(socket, CURL_CSELECT_OUT) ))]
-        else evModify ev [evDelete (socket, evWrite)]
-        ; 1)
+        else 1;
+        if poll = CURL_POLL_REMOVE
+        then evModify ev [evDelete (socket, evRead), evDelete (socket, evWrite)]
+        else 1
+      )
 
 
     in

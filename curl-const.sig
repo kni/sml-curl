@@ -31,6 +31,7 @@ sig
   val CURL_POLL_IN        : int
   val CURL_POLL_OUT       : int
   val CURL_POLL_INOUT     : int
+  val CURL_POLL_REMOVE    : int
   val CURL_CSELECT_IN     : int
   val CURL_CSELECT_OUT    : int
   val CURLMOPT_SOCKETFUNCTION : int

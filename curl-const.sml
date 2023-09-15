@@ -42,7 +42,6 @@ struct
   val CURL_POLL_IN        = 1
   val CURL_POLL_OUT       = 2
   val CURL_POLL_INOUT     = 3
-  val CURL_POLL_REMOVE    = 4
   val CURL_CSELECT_IN     = 1
   val CURL_CSELECT_OUT    = 2
 

@@ -90,37 +90,44 @@ struct
 
 
       val timerId = evTimerNew ev
-      val timerLoopVal = ref (Time.fromSeconds 10)
-      fun timerLoop () = evTimerAdd ev (timerId, !timerLoopVal, fn () => ( cb_timeout (); timerLoop () ))
 
-      fun cb_timer(multi, timeout_ms) = (
-        if timeout_ms < 0 then timerLoopVal := Time.fromSeconds 10 else
-        if timeout_ms = 0 then timerLoopVal := Time.fromMicroseconds 10 else
-                               timerLoopVal := Time.fromMilliseconds (Int.toLarge timeout_ms)
-        ; timerLoop ()
-        ; 1)
-        (*
-        https://curl.haxx.se/mail/lib-2019-03/0125.html
-        Because of this 10 microseconds used for 0.
-        By the way, libev use 1 microsecond for 0.
-        *)
+      fun cb_timer(multi, timeout_ms) =
+        let
+          val v =
+            if timeout_ms < 0 then Time.fromSeconds 10 else
+            (* if timeout_ms = 0 then Time.fromMicroseconds 1 else *)
+            if timeout_ms = 0 then Time.fromMilliseconds 1 else
+                                   Time.fromMilliseconds (Int.toLarge timeout_ms)
+          (*
+          https://curl.haxx.se/mail/lib-2019-03/0125.html
+          Because of this, 1 microseconds used for 0.
+          By the way, libev use 1 microsecond for 0.
+          C example from libcurl use 1 milliseconds for 0.
+          *)
+        in
+          evTimerAdd ev (timerId, v, cb_timeout);
+          1
+        end
 
 
       fun cb_socket(easy, socket, poll) = (
         if poll = CURL_POLL_IN orelse poll = CURL_POLL_INOUT
         then evModify ev [evAdd (socket, evRead, (fn (_,_) => socket_action(socket, CURL_CSELECT_IN) ))]
         else evModify ev [evDelete (socket, evRead)]
+               handle _ => (print ("Curl got exception for evDelete evRead on " ^ Int.toString socket ^ " fd.\n"); 0)
         ;
         if poll = CURL_POLL_OUT orelse poll = CURL_POLL_INOUT
         then evModify ev [evAdd (socket, evWrite, (fn (_,_) => socket_action(socket, CURL_CSELECT_OUT) ))]
         else evModify ev [evDelete (socket, evWrite)]
-        ; 1)
+               handle _ => (print ("Curl got exception for evDelete evWrite on " ^ Int.toString socket ^ " fd.\n"); 0)
+        ;
+        1
+      )
 
 
     in
       Multi.setopt_socket_cb(multi, cb_socket);
       Multi.setopt_timer_cb(multi, cb_timer);
-      timerLoop ();
       add_handle
     end
 end
